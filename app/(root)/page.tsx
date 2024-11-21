@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import HomeFilter from '@/components/filters/HomeFilter';
 import LocalSearch from '@/components/search/LocalSearch';
 import { Button } from '@/components/ui/button';
 import ROUTES from '@/constants/routes';
@@ -7,9 +8,9 @@ import ROUTES from '@/constants/routes';
 const questions = [
   {
     _id: '1',
-    title: 'How to create a custom hook in React?',
+    title: 'How to learn Javascript?',
     description:
-      'I want to create a custom hook in React that can be reused across multiple components. Anyone know how I can do that?',
+      'I want to learn Javascript. Anyone know how I can start learning Javascript?',
     tags: [
       { _id: '1', name: 'React' },
       { _id: '2', name: 'Javascript' },
@@ -43,10 +44,18 @@ interface SearchParams {
 }
 
 const Home = async ({ searchParams }: SearchParams) => {
-  const { query = '' } = await searchParams;
+  const { query = '', filter = '' } = await searchParams;
 
   const filteredQuestions = questions.filter((question) => {
-    return question.title.toLowerCase().includes(query?.toLowerCase());
+    const matchesQuery = question.title
+      .toLowerCase()
+      .includes(query?.toLowerCase());
+
+    const matchesFilter = question.tags.some((tag) =>
+      tag.name.toLowerCase().includes(filter?.toLowerCase())
+    );
+
+    return matchesQuery && matchesFilter;
   });
 
   return (
@@ -68,9 +77,9 @@ const Home = async ({ searchParams }: SearchParams) => {
           otherClasses='flex-1'
         />
       </section>
-      HomeFilter
+      <HomeFilter />
       <div className='mt-10 flex w-full flex-col gap-6'>
-        {questions.map((question) => (
+        {filteredQuestions.map((question) => (
           <h1 key={question._id}>{question.title}</h1>
         ))}
       </div>
